@@ -1,106 +1,87 @@
-let postId = 1;
-
-const posts = [
-  {
-    id: 1,
-    title: 'Title',
-    body: 'content',
-  },
-];
+import Post from '../../models/post';
 
 /* Write Post
 POST /api/posts
-{ title, body }
+{
+  title: 'title',
+  body: 'content',
+  tags: ['tag1', 'tag2']
+}
 */
-export const write = ctx => {
-  const { title, body } = ctx.request.body;
-  postId += 1;
-  const post = { id: postId, title, body };
-  posts.push(post);
-  ctx.body = post;
+export const write = async ctx => {
+  const { title, body, tags } = ctx.request.body;
+  const post = new Post({
+    title,
+    body,
+    tags,
+  });
+
+  try {
+    await post.save();
+    ctx.body = post;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
 };
 
 /* Lookup Post List
 GET /api/posts
 */
-export const list = ctx => {
-  ctx.body = posts;
+export const list = async ctx => {
+  try {
+    const posts = await Post.find().exec();
+    ctx.body = posts;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
 };
 
 /* Search a post
 GET /api/posts/:id
 */
-export const read = ctx => {
+export const read = async ctx => {
   const { id } = ctx.params;
-  const post = posts.find(p => p.id.toString() === id);
-
-  if (!post) {
-    ctx.status = 404;
-    ctx.body = {
-      message: 'There is no such a post',
-    };
-    return;
+  try {
+    const post = await Post.findById(id).exec();
+    if (!post) {
+      ctx.status = 404;
+      return;
+    }
+    ctx.body = post;
+  } catch (e) {
+    ctx.throw(500, e);
   }
-  ctx.body = post;
 };
 
 /* Delete a post
 DELETE /api/posts/:id
 */
-export const remove = ctx => {
+export const remove = async ctx => {
   const { id } = ctx.params;
-  const index = posts.findIndex(p => p.id.toString() === id);
-  if (index === -1) {
-    ctx.status = 404;
-    ctx.body = {
-      message: 'There is no such a post',
-    };
+  try {
+    await Post.findByIdAndDelete(id).exec();
+    ctx.status = 204; // No Content
+  } catch (e) {
+    ctx.throw(500, e);
   }
-
-  posts.splice(index, 1);
-  ctx.status = 204; // No Content
-};
-
-/* Modify posts(replace)
-PUT /api/posts/:id
-{ title, body }
-*/
-export const replace = ctx => {
-  // PUT Method is used to replace entire data
-  const { id } = ctx.params;
-  const index = posts.findIndex(p => p.id.toString() === id);
-  if (index === -1) {
-    ctx.status = 404;
-    ctx.body = {
-      message: 'There is no such a post',
-    };
-    return;
-  }
-  posts[index] = {
-    id,
-    ...ctx.request.body,
-  };
 };
 
 /* Modify Post (Specific Field)
 PATCH /api/posts/:id
 {title, body}
 */
-export const update = ctx => {
-  // PATCH Method replace only given fields
+export const update = async ctx => {
   const { id } = ctx.params;
-  const index = posts.findIndex(p => p.id.toString() === id);
-  if (index === -1) {
-    ctx.status = 404;
-    ctx.body = {
-      message: 'There is no such a post',
-    };
-    return;
+  try {
+    const post = await Post.findByIdAndUpdate(id, ctx.request.body, {
+      new: true, // When it set, return old data. When it not set, return new data
+    }).exec();
+    if (!post) {
+      ctx.status = 404;
+      return;
+    }
+    ctx.body = post;
+  } catch (e) {
+    ctx.throw(500, e);
   }
-
-  posts[index] = {
-    ...posts[index],
-    ...ctx.request.body,
-  };
-  ctx.body = posts[index];
 };
