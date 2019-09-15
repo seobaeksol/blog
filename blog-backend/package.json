@@ -9,6 +9,7 @@
     "eslint-config-prettier": "^6.3.0",
     "esm": "^3.2.25",
     "joi": "^14.3.1",
+    "jsonwebtoken": "^8.5.1",
     "koa": "^2.8.1",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",
