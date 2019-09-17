@@ -8,6 +8,7 @@ export const changeField = createAction(CHANGE_FIELD, ({ key, value }) => ({
   key,
   value,
 }));
+export function* writeSaga() {
 
 const initialState = {
   title: '',
