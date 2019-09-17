@@ -86,6 +86,10 @@ const TagBox = () => {
     [localTags],
   );
 
+  const onChange = useCallback(e => {
+    setInput(e.target.value);
+  }, []);
+
   const onRemove = useCallback(
     tag => {
       setLocalTags(localTags.filter(t => t !== tag));
@@ -93,14 +97,27 @@ const TagBox = () => {
     [localTags],
   );
 
+  const onSubmit = useCallback(
+    e => {
+      e.preventDefault();
+      insertTag(input.trim());
+      setInput('');
+    },
+    [input, insertTag],
+  );
+
   return (
     <TagBoxBlock>
       <h4>Tag</h4>
-      <TagForm>
-        <input placeholder="Insert Tag Here." />
+      <TagForm onSubmit={onSubmit}>
+        <input
+          placeholder="Insert Tag Here."
+          value={input}
+          onChange={onChange}
+        />
         <button type="submit">Add</button>
       </TagForm>
-      <TagList tags={['tag1', 'tag2', 'tag3']} />
+      <TagList tags={localTags} onRemove={onRemove} />
     </TagBoxBlock>
   );
 };
