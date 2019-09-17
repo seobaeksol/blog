@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import AuthForm from '../../components/auth/AuthForm';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeField, initializeForm, register } from '../../modules/auth';
@@ -6,6 +6,7 @@ import { check } from '../../modules/user';
 import { withRouter } from 'react-router-dom';
 
 const RegisterForm = ({ history }) => {
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const { form, auth, authError, user } = useSelector(({ auth, user }) => ({
     form: auth.register,
@@ -21,8 +22,15 @@ const RegisterForm = ({ history }) => {
   const onSubmit = e => {
     e.preventDefault();
     const { username, password, passwordConfirm } = form;
+    if ([username, password, passwordConfirm].includes('')) {
+      setError('Fill empty fields');
+      return;
+    }
+
     if (password !== passwordConfirm) {
-      // TODO: Error Handling
+      setError("Password doesn't match");
+      changeField({ form: 'register', key: 'password', value: '' });
+      changeField({ form: 'register', key: 'passwordConfirm', value: '' });
       return;
     }
     dispatch(register({ username, password }));
@@ -36,6 +44,11 @@ const RegisterForm = ({ history }) => {
     if (authError) {
       console.log('error occured');
       console.log(authError);
+      if (authError.response.status === 409) {
+        setError('Already exist ID');
+        return;
+      }
+      setError('Failed to register');
       return;
     }
 
@@ -58,6 +71,7 @@ const RegisterForm = ({ history }) => {
       form={form}
       onChange={onChange}
       onSubmit={onSubmit}
+      error={error}
     />
   );
 };
