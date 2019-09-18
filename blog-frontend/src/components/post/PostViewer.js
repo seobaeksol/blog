@@ -25,7 +25,7 @@ const PostContent = styled.div`
   color: ${palette.gray[8]};
 `;
 
-const PostViewer = ({ post, loading, error, actionButtons }) => {
+const PostViewer = ({ post, loading, error, actionButtons, ownPost }) => {
   if (error) {
     if (error.response && error.response.status === 404) {
       return <PostViewerBlock>No Such Post.</PostViewerBlock>;
@@ -41,7 +41,7 @@ const PostViewer = ({ post, loading, error, actionButtons }) => {
         <h1>{post.title}</h1>
         <SubInfo
           hasMarginTop={true}
-          username={post.username}
+          username={post.user.username}
           publishedDate={post.publishedDate}
         />
         <Tags tags={post.tags} />
@@ -51,7 +51,7 @@ const PostViewer = ({ post, loading, error, actionButtons }) => {
           __html: post.body,
         }}
       />
-      {actionButtons}
+      {ownPost && actionButtons}
     </PostViewerBlock>
   );
 };

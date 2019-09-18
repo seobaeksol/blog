@@ -22,3 +22,5 @@ export const updatePost = ({ id, title, body, tags }) =>
     body,
     tags,
   });
+
+export const deletePost = id => client.delete(`/api/posts/${id}`);
