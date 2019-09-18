@@ -55,7 +55,7 @@ export const checkOwnPost = async (ctx, next) => {
     ctx.status = 403;
     return;
   }
-  next();
+  return next();
 };
 
 /* Write Post
@@ -188,9 +188,10 @@ export const update = async ctx => {
   }
 
   const { id } = ctx.params;
+
   try {
     const post = await Post.findByIdAndUpdate(id, nextData, {
-      new: true, // When it set, return old data. When it not set, return new data
+      new: true, // When it not set, return old data. When it set, return new data
     }).exec();
     if (!post) {
       ctx.status = 404;
