@@ -5,6 +5,7 @@ import palette from '../../lib/styles/palette';
 import Button from '../common/Button';
 import SubInfo from '../common/SubInfo';
 import Tags from '../common/Tags';
+import { Link } from 'react-router-dom';
 
 const PostListBlock = styled(Responsive)`
   margin-top: 3rem;
@@ -39,31 +40,41 @@ const PostItemBlock = styled.div`
   }
 `;
 
-const PostItem = () => {
+const PostItem = ({ post }) => {
   return (
     <PostItemBlock>
-      <h2>Title</h2>
+      <h2>
+        <Link to={`/@${post.user.username}/${post._id}`}>{post.title}</Link>
+      </h2>
       <SubInfo
-        username={'username'}
-        publishedDate={new Date().toLocaleDateString()}
+        username={post.user.username}
+        publishedDate={post.publishedDate}
+        hasMarginTop
       />
-      <Tags tags={['tag1', 'tag2', 'tag3']} />
+      <Tags tags={post.tags} />
+      <p>{post.body}</p>
     </PostItemBlock>
   );
 };
 
-const PostList = () => {
+const PostList = ({ posts, showWriteButton, loading, error }) => {
+  if (error) {
+    return <PostListBlock>Error Occured</PostListBlock>;
+  }
+
   return (
     <PostListBlock>
-      <WrtiePostButtonWrapper>
-        <Button cyan to="/write">
-          Write New Post
-        </Button>
-      </WrtiePostButtonWrapper>
+      {showWriteButton && (
+        <WrtiePostButtonWrapper>
+          <Button cyan to="/write">
+            Write New Post
+          </Button>
+        </WrtiePostButtonWrapper>
+      )}
       <div>
-        <PostItem></PostItem>
-        <PostItem></PostItem>
-        <PostItem></PostItem>
+        {!loading &&
+          posts &&
+          posts.map(post => <PostItem key={post._id} post={post} />)}
       </div>
     </PostListBlock>
   );

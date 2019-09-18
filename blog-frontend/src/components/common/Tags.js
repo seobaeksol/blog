@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import palette from '../../lib/styles/palette';
 
 const TagsBlock = styled.div`
@@ -18,7 +18,12 @@ const TagsBlock = styled.div`
 const Tags = ({ tags }) => {
   return (
     <TagsBlock>
-      {tags && tags.map(t => <div className="tag">#{t}</div>)}
+      {tags &&
+        tags.map(t => (
+          <div key={t} className="tag">
+            #{t}
+          </div>
+        ))}
     </TagsBlock>
   );
 };
